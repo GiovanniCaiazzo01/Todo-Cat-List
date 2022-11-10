@@ -3,7 +3,7 @@ const { MongoClient } = require("mongodb");
 
 let db;
 
-module.exports.connectDB = async () => {
+const connectDB = async () => {
   // Connection URL
   const { URI } = process.env;
   const client = new MongoClient(URI);
@@ -17,9 +17,12 @@ module.exports.connectDB = async () => {
     console.log(error);
   }
 
-  db = client.db(dbName);
+  return (db = client.db(dbName));
 };
 
 module.exports.getDB = () => {
+  if (db === undefined) {
+    return connectDB();
+  }
   return db;
 };
