@@ -1,28 +1,33 @@
 require("dotenv").config({ path: "./.env" });
 const { MongoClient } = require("mongodb");
 
-let db;
-
-const connectDB = async () => {
-  // Connection URL
+const connectDb = async () => {
   const { URI } = process.env;
   const client = new MongoClient(URI);
-
-  // Databse name
-  const dbName = "Todo";
   try {
+    console.log("Databese its ready to be droped in production");
     await client.connect();
-    console.log("Databese it's ready to be dropt in production");
+    return client.db("Todo");
   } catch (error) {
-    console.log(error);
+    return error;
   }
-
-  return (db = client.db(dbName));
 };
 
-module.exports.getDB = () => {
-  if (db === undefined) {
-    return connectDB();
+module.exports.getDb = async () => {
+  let db = undefined;
+  let instance = 0;
+
+  try {
+    instance++;
+    console.log(`Database instance: ${instance}`);
+    if (db === undefined) {
+      console.log("preparing a new db instancion...");
+      db = await connectDb();
+      return db;
+    }
+    console.log("there are already an instance of databse alive..");
+    return db;
+  } catch (error) {
+    return error;
   }
-  return db;
 };
