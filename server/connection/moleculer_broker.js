@@ -1,12 +1,10 @@
 const { ServiceBroker } = require("moleculer");
 
-const createServiceBroker = () => {
-  try {
-    console.log("broker created");
-    return new ServiceBroker();
-  } catch (error) {
-    return error;
-  }
+// Mc imports
+const TASK_SERVICE = require("../api/services/tasks/tasks.service");
+
+const createService = (broker) => {
+  broker.createService(TASK_SERVICE);
 };
 module.exports.getServiceBroker = () => {
   let broker = undefined;
@@ -18,7 +16,8 @@ module.exports.getServiceBroker = () => {
 
     if (broker === undefined) {
       console.log("preparing ServiceBroker instance...");
-      const broker = createServiceBroker();
+      broker = new ServiceBroker();
+      createService(broker);
       console.log("------------------------------");
 
       return broker;

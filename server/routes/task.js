@@ -1,12 +1,13 @@
 const express = require("express");
-const dbConnection = require("../connection/database");
 const router = express.Router();
+let getBroker = require("../connection/moleculer_broker");
 
-router.get("/add-task", async (req, res) => {
-  const db = await dbConnection.getDb();
-  const data = await db.collection("task").findOne({});
-  console.log(data);
-  return res.send("wewe");
+broker = getBroker.getServiceBroker();
+
+router.get("/read-task", async (req, res) => {
+  const tasks = broker.call("tasks.get_all");
+  return res.send(tasks);
+  res.send("we");
 });
 
 module.exports = router;
