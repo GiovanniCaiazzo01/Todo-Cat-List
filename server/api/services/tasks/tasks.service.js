@@ -1,5 +1,16 @@
 const { getDb } = require("../../../connection/database");
 
+const getDate = () => {
+  const date = new Date();
+  const format = {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    day: date.getDate(),
+  };
+
+  return format;
+};
+
 module.exports = {
   name: "tasks",
   actions: {
@@ -7,7 +18,14 @@ module.exports = {
       const db = await getDb();
 
       try {
-        const tasks = await db.collection("tasks").find({}).toArray();
+        const tasks = await db
+          .collection("task")
+          .find(
+            {},
+            { projection: { _id: 0, title: 1, description: 1, isDone: 1 } }
+          )
+          .toArray();
+
         if (!tasks) {
           return {
             result: false,
@@ -15,7 +33,32 @@ module.exports = {
           };
         }
 
-        return { result: true, message: "task recuperati con successo" };
+        const toReturn = {
+          ...tasks,
+          result: true,
+          message: "task recuperati con successo",
+        };
+
+        return toReturn;
+      } catch (error) {
+        return error;
+      }
+    },
+    async save_task(ctx) {
+      const { title, description, isDone } = ctx.params.task;
+
+      if (!title) {
+        return { result: false, message: "Please insert at least a title" };
+      }
+
+      try {
+        const save_task = await getDb
+          .collection("task")
+          .insertOne({ title, description, isDone, timeStamp: getDate() });
+        if (save_task.acknowledged === false) {
+          return { result: false, message: "the task could not be saved" };
+        }
+        return { result: true, message: "Task added successfully" };
       } catch (error) {
         return error;
       }
