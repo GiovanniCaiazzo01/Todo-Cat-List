@@ -24,7 +24,7 @@ module.exports.getDb = async () => {
     console.log(`Database instance: ${instance}`);
 
     if (db === undefined) {
-      console.log("preparing a new db instancion...");
+      console.log("preparing a new db instanction...");
       db = await connectDb();
       console.log("------------------------------");
 
