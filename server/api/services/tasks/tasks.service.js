@@ -1,4 +1,5 @@
 const { getDb } = require("../../../connection/database");
+const { uuid } = require("uuidv4");
 
 const getDate = () => {
   const date = new Date();
@@ -9,6 +10,13 @@ const getDate = () => {
   };
 
   return format;
+};
+const generateId = () => {
+  let hexString = uuid();
+  // remove decoration
+  hexString = hexString.replace(/-/g, "");
+  let base64String = Buffer.from(hexString, "hex").toString("base64");
+  return base64String;
 };
 
 module.exports = {
@@ -52,9 +60,13 @@ module.exports = {
       }
 
       try {
-        const save_task = await getDb
-          .collection("task")
-          .insertOne({ title, description, isDone, timeStamp: getDate() });
+        const save_task = await getDb.collection("task").insertOne({
+          title,
+          description,
+          isDone,
+          timeStamp: getDate(),
+          task_id: generateId(),
+        });
         if (save_task.acknowledged === false) {
           return { result: false, message: "the task could not be saved" };
         }
@@ -62,6 +74,21 @@ module.exports = {
       } catch (error) {
         return error;
       }
+    },
+
+    // da finire
+    async delete_task(ctx) {
+      const { task_id } = ctx.params;
+
+      if (!task_id) {
+        return { result: false, message: "Task_id not present" };
+      }
+      try {
+        const delete_task = getDb().collection("task").deleteOne({ task_id });
+        if (!delete_task) {
+          return { result: false, message: "there was a problem" };
+        }
+      } catch (error) {}
     },
   },
 };

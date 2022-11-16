@@ -12,4 +12,18 @@ router.post("/save_task", async (req, res) => {
   return res.send(result);
 });
 
+router.post("/delete-task", async (req, res) => {
+  const { task_id } = req.body;
+  const result = await global.broker.call("task.delete_task", { task_id });
+  return res.send(result);
+});
+
+router.post("/update-task", async (req, res) => {
+  const { task_id, to_update } = req.body;
+  const result = await global.broker.call("task.delete_task", {
+    task_id,
+    to_update,
+  });
+  return res.send(result);
+});
 module.exports = router;
