@@ -30,7 +30,16 @@ module.exports = {
           .collection("task")
           .find(
             {},
-            { projection: { _id: 0, title: 1, description: 1, isDone: 1 } }
+            {
+              projection: {
+                _id: 0,
+                title: 1,
+                description: 1,
+                isDone: 1,
+                time_stamp: 1,
+                task_id: 1,
+              },
+            }
           )
           .toArray();
 
@@ -41,13 +50,7 @@ module.exports = {
           };
         }
 
-        const toReturn = {
-          ...tasks,
-          result: true,
-          message: "task recuperati con successo",
-        };
-
-        return toReturn;
+        return { result: true, tasks };
       } catch (error) {
         return error;
       }
@@ -86,9 +89,14 @@ module.exports = {
       try {
         const delete_task = getDb().collection("task").deleteOne({ task_id });
         if (!delete_task) {
-          return { result: false, message: "there was a problem" };
+          return {
+            result: false,
+            message: "there was a problem deleting this task",
+          };
         }
-      } catch (error) {}
+      } catch (error) {
+        return error;
+      }
     },
   },
 };

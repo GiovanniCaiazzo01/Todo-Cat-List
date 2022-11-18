@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 
-router.get("/get_all_task", async (req, res) => {
+router.get("/get_all", async (req, res) => {
   const tasks = await global.broker.call("tasks.get_all");
   return res.send(tasks);
 });
 
-router.post("/save_task", async (req, res) => {
+router.post("/save", async (req, res) => {
+  console.log(req);
   const { task } = req.body;
   const result = await global.broker.call("tasks.save_task", { task });
   return res.send(result);
