@@ -1,5 +1,7 @@
+require("dotenv").config({ path: "../../../.env" });
 const { getDb } = require("../../../connection/database");
 const { uuid } = require("uuidv4");
+const axios = require("axios");
 
 const getDate = () => {
   const date = new Date();
@@ -9,7 +11,9 @@ const getDate = () => {
     day: date.getDate(),
   };
 
-  return format;
+  const toReturn = `${format.year}-${format.month}-${format.day}`;
+
+  return toReturn;
 };
 const generateId = () => {
   let hexString = uuid();
@@ -17,6 +21,15 @@ const generateId = () => {
   hexString = hexString.replace(/-/g, "");
   let base64String = Buffer.from(hexString, "hex").toString("base64");
   return base64String;
+};
+
+const pickCatAvatar = async () => {
+  const { PUBLIC_KEY_API_CAT } = process.env;
+  const CAT_API = `https:api.thecatapi.com/v1/images/search?api_key=${PUBLIC_KEY_API_CAT}`;
+  const data = await axios.get(CAT_API);
+  let toReturn = data.data[0].url;
+  console.log(typeof toReturn);
+  return toReturn;
 };
 
 module.exports = {
@@ -36,7 +49,8 @@ module.exports = {
                 title: 1,
                 description: 1,
                 isDone: 1,
-                time_stamp: 1,
+                timeStamp: 1,
+                avatar: 1,
                 task_id: 1,
               },
             }
@@ -56,20 +70,23 @@ module.exports = {
       }
     },
     async save_task(ctx) {
-      const { title, description, isDone } = ctx.params.task;
+      const db = await getDb();
 
+      const { title, description, isDone } = ctx.params;
       if (!title) {
         return { result: false, message: "Please insert at least a title" };
       }
 
       try {
-        const save_task = await getDb.collection("task").insertOne({
+        const save_task = await db.collection("task").insertOne({
           title,
           description,
           isDone,
           timeStamp: getDate(),
           task_id: generateId(),
+          avatar: await pickCatAvatar(),
         });
+        console.log("weeeeeeeeeeeeeee", save_task);
         if (save_task.acknowledged === false) {
           return { result: false, message: "the task could not be saved" };
         }

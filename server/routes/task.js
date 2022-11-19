@@ -7,9 +7,8 @@ router.get("/get_all", async (req, res) => {
 });
 
 router.post("/save", async (req, res) => {
-  console.log(req);
   const { task } = req.body;
-  const result = await global.broker.call("tasks.save_task", { task });
+  const result = await global.broker.call("tasks.save_task", task);
   return res.send(result);
 });
 
