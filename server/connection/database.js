@@ -13,25 +13,23 @@ const connectDb = async () => {
     return error;
   }
 };
+let db = undefined;
+let instance = 0;
 
 module.exports.getDb = async () => {
-  let db = undefined;
-  let instance = 0;
   console.log("------------------------------");
 
   try {
-    instance++;
-    console.log(`Database instance: ${instance}`);
-
-    if (db === undefined) {
-      console.log("preparing a new db instanction...");
-      db = await connectDb();
+    if (db !== undefined) {
+      console.log("there are already an instance of databse alive..");
       console.log("------------------------------");
 
       return db;
     }
-
-    console.log("there are already an instance of databse alive..");
+    ++instance;
+    console.log(`Database instance: ${instance}`);
+    console.log("preparing a new db instanction...");
+    db = await connectDb();
     console.log("------------------------------");
 
     return db;
