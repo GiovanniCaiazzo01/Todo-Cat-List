@@ -22,7 +22,6 @@ const AddTask = ({ onSave }) => {
     setLoading(() => false);
     const res = data.data;
     onSave(res.message, res.result);
-    console.log(res);
   };
 
   const content = (

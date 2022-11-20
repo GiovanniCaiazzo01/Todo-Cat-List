@@ -12,15 +12,15 @@ router.post("/save", async (req, res) => {
   return res.send(result);
 });
 
-router.post("/delete-task", async (req, res) => {
-  const { task_id } = req.body;
-  const result = await global.broker.call("task.delete_task", { task_id });
+router.delete("/delete-task/:task_id", async (req, res) => {
+  const { task_id } = req.params;
+  const result = await global.broker.call("tasks.delete_task", { task_id });
   return res.send(result);
 });
 
 router.post("/update-task", async (req, res) => {
   const { task_id, to_update } = req.body;
-  const result = await global.broker.call("task.delete_task", {
+  const result = await global.broker.call("tasks.delete_task", {
     task_id,
     to_update,
   });

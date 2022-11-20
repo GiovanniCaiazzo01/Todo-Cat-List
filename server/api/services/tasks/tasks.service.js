@@ -20,6 +20,7 @@ const generateId = () => {
   // remove decoration
   hexString = hexString.replace(/-/g, "");
   let base64String = Buffer.from(hexString, "hex").toString("base64");
+  base64String = base64String.replace("/", "");
   return base64String;
 };
 
@@ -28,7 +29,6 @@ const pickCatAvatar = async () => {
   const CAT_API = `https:api.thecatapi.com/v1/images/search?api_key=${PUBLIC_KEY_API_CAT}`;
   const data = await axios.get(CAT_API);
   let toReturn = data.data[0].url;
-  console.log(typeof toReturn);
   return toReturn;
 };
 
@@ -86,7 +86,6 @@ module.exports = {
           task_id: generateId(),
           avatar: await pickCatAvatar(),
         });
-        console.log("weeeeeeeeeeeeeee", save_task);
         if (save_task.acknowledged === false) {
           return { result: false, message: "the task could not be saved" };
         }
@@ -96,21 +95,28 @@ module.exports = {
       }
     },
 
-    // da finire
     async delete_task(ctx) {
+      const db = await getDb();
+
       const { task_id } = ctx.params;
 
       if (!task_id) {
         return { result: false, message: "Task_id not present" };
       }
+
       try {
-        const delete_task = getDb().collection("task").deleteOne({ task_id });
+        const delete_task = await db
+          .collection("task")
+          .deleteOne({ task_id: task_id });
+
         if (!delete_task) {
           return {
             result: false,
             message: "there was a problem deleting this task",
           };
         }
+
+        return { result: true, message: "Task deleted successfully" };
       } catch (error) {
         return error;
       }

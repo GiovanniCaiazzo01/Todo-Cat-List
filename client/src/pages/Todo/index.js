@@ -3,7 +3,7 @@ import { SearchBar, TaskList } from "./pieces";
 const Todo = () => {
   return (
     <>
-      <SearchBar />
+      {/* <SearchBar /> */}
       <TaskList />
     </>
   );
