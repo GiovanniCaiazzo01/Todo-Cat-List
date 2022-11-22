@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button, Popover, Input, Tag, Checkbox } from "antd";
 import axios from "axios";
-const AddTask = ({ onSave }) => {
+const AddTask = ({ onMessage }) => {
   const [task, setTask] = useState({
     title: "",
     description: "",
@@ -21,7 +21,7 @@ const AddTask = ({ onSave }) => {
     const data = await axios.post(base_url + "/todo/save", { task });
     setLoading(() => false);
     const res = data.data;
-    onSave(res.message, res.result);
+    onMessage(res.message, res.result);
   };
 
   const content = (
@@ -36,11 +36,16 @@ const AddTask = ({ onSave }) => {
         prefix={<Tag color="gray">Description :</Tag>}
         onChange={handleChange}
       />
-
-      <Tag color="gray">
-        Done&nbsp;&nbsp;
-        <Checkbox name="isDone" onChange={handleChange}></Checkbox>
-      </Tag>
+      <Input
+        name="isDone"
+        disabled={true}
+        prefix={
+          <>
+            <Tag color="gray">Done&nbsp;&nbsp;:</Tag>
+            <Checkbox name="isDone" onChange={handleChange}></Checkbox>
+          </>
+        }
+      />
 
       <Button loading={loading} onClick={() => saveTask()}>
         Salva

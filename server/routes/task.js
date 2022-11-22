@@ -18,11 +18,12 @@ router.delete("/delete-task/:task_id", async (req, res) => {
   return res.send(result);
 });
 
-router.post("/update-task", async (req, res) => {
-  const { task_id, to_update } = req.body;
-  const result = await global.broker.call("tasks.delete_task", {
+router.put("/update-task/:task_id", async (req, res) => {
+  const { fields } = req.body;
+  const { task_id } = req.params;
+  const result = await global.broker.call("tasks.edit_task", {
     task_id,
-    to_update,
+    fields,
   });
   return res.send(result);
 });

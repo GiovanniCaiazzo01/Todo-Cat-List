@@ -1,23 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { Avatar, Card, Skeleton, Row, Tag, message } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import axios from "axios";
+import { EditCard, DeleteCard } from "./pieces";
 
-const TaskCard = ({ saveResult }) => {
+const TaskCard = ({ onMessage, saveResult }) => {
   const [tasks, setTask] = useState();
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
 
   const base_url = "http://127.0.0.1:5000";
   const onDelete = (message, result) => {
-    messageApi.open({
-      type: result ? "success" : "error",
-      content: message,
-      duration: 3,
-    });
+    onMessage(message, result);
   };
 
+  const onUpdate = (message, result) => {
+    onMessage(message, result);
+  };
   const fetchTask = async () => {
     setLoading(true);
     const data = await axios.get(base_url + "/todo/get_all");
@@ -26,23 +24,12 @@ const TaskCard = ({ saveResult }) => {
     setLoading(false);
   };
 
-  const deleteTask = async (task_id) => {
-    setLoading(true);
-    const data = await axios.delete(`${base_url}/todo/delete-task/${task_id}`);
-    const res = data.data;
-    setResult(() => res.result);
-    onDelete(res.message, res.result);
-    setLoading(false);
-  };
-
   useEffect(() => {
     fetchTask();
-    setResult(() => false);
-  }, [saveResult, result]);
+  }, [saveResult]);
 
   return (
     <>
-      {contextHolder}
       {tasks ? (
         <Row>
           {tasks.map((task) => {
@@ -56,13 +43,13 @@ const TaskCard = ({ saveResult }) => {
                 }}
                 actions={[
                   <Tag color="blue">{task.timeStamp}</Tag>,
-                  <EditOutlined key="edit" />,
+                  <EditCard onUpdate={onUpdate} task={task} />,
                   task.isDone ? (
                     <Tag color="green">Done</Tag>
                   ) : (
                     <Tag color="red">Not Done</Tag>
                   ),
-                  <DeleteOutlined onClick={() => deleteTask(task.task_id)} />,
+                  <DeleteCard onDelete={onDelete} task_id={task.task_id} />,
                 ]}
                 key={task.task_id}
               >

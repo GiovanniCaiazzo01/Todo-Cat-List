@@ -1,6 +1,6 @@
 require("dotenv").config({ path: "../../../.env" });
 const { getDb } = require("../../../connection/database");
-const { uuid } = require("uuidv4");
+const { v4: uuidv4 } = require("uuid");
 const axios = require("axios");
 
 const getDate = () => {
@@ -15,13 +15,8 @@ const getDate = () => {
 
   return toReturn;
 };
-const generateId = () => {
-  let hexString = uuid();
-  // remove decoration
-  hexString = hexString.replace(/-/g, "");
-  let base64String = Buffer.from(hexString, "hex").toString("base64");
-  base64String = base64String.replace("/", "");
-  return base64String;
+const generateId = async () => {
+  return uuidv4();
 };
 
 const pickCatAvatar = async () => {
@@ -83,7 +78,7 @@ module.exports = {
           description,
           isDone,
           timeStamp: getDate(),
-          task_id: generateId(),
+          task_id: await generateId(),
           avatar: await pickCatAvatar(),
         });
         if (save_task.acknowledged === false) {
@@ -94,7 +89,38 @@ module.exports = {
         return error;
       }
     },
+    async edit_task(ctx) {
+      const db = await getDb();
+      const { task_id, fields } = ctx.params;
 
+      if (!task_id) {
+        return {
+          result: false,
+          message: "There was a problem updating this task",
+        };
+      }
+      try {
+        const to_update = await db.collection("task").updateOne(
+          { task_id },
+          {
+            $set: {
+              title: fields.title,
+              description: fields.description,
+              isDone: fields.isDone,
+            },
+          }
+        );
+        if (to_update.acknowledged === false) {
+          return {
+            result: false,
+            message: "There was a problem updating this task",
+          };
+        }
+        return { result: true, message: "Task updated successfully" };
+      } catch (error) {
+        return { error };
+      }
+    },
     async delete_task(ctx) {
       const db = await getDb();
 

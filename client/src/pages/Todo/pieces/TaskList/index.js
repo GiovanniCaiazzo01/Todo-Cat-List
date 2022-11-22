@@ -6,15 +6,14 @@ const TaskList = () => {
   const [result, setResult] = useState();
   const [messageApi, contextHolder] = message.useMessage();
 
-  const onSave = (message, result) => {
+  const onMessage = (message, result) => {
     setResult(() => result);
     messageApi.open({
       type: result ? "success" : "error",
       content: message,
-      duration: 3,
+      duration: 5,
     });
   };
-
   React.useEffect(() => {
     setResult(() => false);
   }, [result]);
@@ -23,9 +22,9 @@ const TaskList = () => {
     <>
       {contextHolder}
       <Divider />
-      <AddTask onSave={onSave} />
+      <AddTask onMessage={onMessage} />
       <Divider />
-      <TaskCard saveResult={result} />
+      <TaskCard onMessage={onMessage} saveResult={result} />
     </>
   );
 };
