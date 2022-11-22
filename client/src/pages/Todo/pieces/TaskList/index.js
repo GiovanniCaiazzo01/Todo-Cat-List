@@ -23,8 +23,8 @@ const TaskList = () => {
       {contextHolder}
       <Divider />
       <AddTask onMessage={onMessage} />
-      <Divider />
       <TaskCard onMessage={onMessage} saveResult={result} />
+      <Divider />
     </>
   );
 };
