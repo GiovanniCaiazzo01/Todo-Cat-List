@@ -7,7 +7,7 @@ const getDate = () => {
   const date = new Date();
   const format = {
     year: date.getFullYear(),
-    month: date.getMonth(),
+    month: date.getMonth() + 1,
     day: date.getDate(),
   };
 
